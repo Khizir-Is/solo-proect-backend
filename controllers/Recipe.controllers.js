@@ -3,7 +3,7 @@ const Recipe = require("../models/Recipe.model");
 module.exports.recipesController = {
   getAllRecipe: async (req, res) => {
     try {
-      const recipe = await Recipe.find();
+      const recipe = await Recipe.aggregate([{ $sample: { size: 1 } }]);
       return res.json(recipe);
     } catch (e) {
       return res.status(400).json({
