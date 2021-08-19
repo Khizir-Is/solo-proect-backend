@@ -1,9 +1,10 @@
+const mongoose = require("mongoose")
 const Recipe = require("../models/Recipe.model");
 
 module.exports.recipesController = {
-  getAllRecipe: async (req, res) => {
+  getAllRecipes: async (req, res) => {
     try {
-      const recipe = await Recipe.aggregate([{ $sample: { size: 1 } }]);
+      const recipe = await Recipe.find();
       return res.json(recipe);
     } catch (e) {
       return res.status(400).json({
@@ -11,6 +12,20 @@ module.exports.recipesController = {
       });
     }
   },
+
+  getCategoryRecipe: async (req, res) => {
+    const { id } = req.params;
+    console.log(id)
+    try {
+      const recipes = await Recipe.aggregate([{ $match: { categoryId: mongoose.Types.ObjectId(id) } }, { $sample: { size: 1 } }])
+      return res.json(recipes);
+    } catch (e) {
+      return res.status(400).json({
+        error: e.toString(),
+      });
+    }
+  },
+
 
   addRecipe: async (req, res) => {
     const { name, compound, calories, description, img, categoryId } = req.body;
@@ -101,7 +116,7 @@ module.exports.recipesController = {
 
     if (!calories) {
       return res.status(400).json({
-        error: "Укажите количество калории",
+        error: "Укажите количество калории.",
       });
     }
 
